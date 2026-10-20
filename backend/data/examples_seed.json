@@ -1,0 +1,172 @@
+[
+ {
+  "question": "Show all customers from Germany",
+  "sql": "SELECT customer_id, first_name, last_name, city FROM customers WHERE country = 'Germany' ORDER BY customer_id",
+  "query_type": "SELECT_SIMPLE"
+ },
+ {
+  "question": "List the 10 most expensive products",
+  "sql": "SELECT name, unit_price FROM products ORDER BY unit_price DESC, product_id LIMIT 10",
+  "query_type": "SELECT_SIMPLE"
+ },
+ {
+  "question": "Which products are currently inactive?",
+  "sql": "SELECT product_id, name FROM products WHERE is_active = 0 ORDER BY product_id",
+  "query_type": "SELECT_SIMPLE"
+ },
+ {
+  "question": "Show orders that were returned",
+  "sql": "SELECT order_id, customer_id, order_date, total_amount FROM orders WHERE status = 'returned' ORDER BY order_id",
+  "query_type": "SELECT_SIMPLE"
+ },
+ {
+  "question": "What product categories do we have?",
+  "sql": "SELECT category_id, name FROM categories ORDER BY category_id",
+  "query_type": "SELECT_SIMPLE"
+ },
+ {
+  "question": "List suppliers based in China",
+  "sql": "SELECT supplier_id, name, lead_time_days FROM suppliers WHERE country = 'China' ORDER BY supplier_id",
+  "query_type": "SELECT_SIMPLE"
+ },
+ {
+  "question": "How many customers are there in each country?",
+  "sql": "SELECT country, COUNT(*) AS customer_count FROM customers GROUP BY country ORDER BY customer_count DESC, country",
+  "query_type": "SELECT_AGGREGATE"
+ },
+ {
+  "question": "What is the average product price?",
+  "sql": "SELECT ROUND(AVG(unit_price), 2) AS avg_price FROM products",
+  "query_type": "SELECT_AGGREGATE"
+ },
+ {
+  "question": "What is the total revenue across all orders?",
+  "sql": "SELECT SUM(total_amount) AS total_revenue FROM orders WHERE status != 'cancelled'",
+  "query_type": "SELECT_AGGREGATE"
+ },
+ {
+  "question": "What is the average order value by customer segment?",
+  "sql": "SELECT c.segment, AVG(o.total_amount) AS avg_order_value FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.status != 'cancelled' GROUP BY c.segment ORDER BY avg_order_value DESC",
+  "query_type": "SELECT_AGGREGATE"
+ },
+ {
+  "question": "How many orders are there for each status?",
+  "sql": "SELECT status, COUNT(*) AS order_count FROM orders GROUP BY status ORDER BY order_count DESC, status",
+  "query_type": "SELECT_AGGREGATE"
+ },
+ {
+  "question": "What is the total quantity sold per product category?",
+  "sql": "SELECT cat.name AS category, SUM(oi.quantity) AS units_sold FROM order_items oi JOIN orders o ON o.order_id = oi.order_id JOIN products p ON p.product_id = oi.product_id JOIN categories cat ON cat.category_id = p.category_id WHERE o.status != 'cancelled' GROUP BY cat.name ORDER BY units_sold DESC, category",
+  "query_type": "SELECT_AGGREGATE"
+ },
+ {
+  "question": "Top 5 suppliers by number of products",
+  "sql": "SELECT s.name, COUNT(*) AS product_count FROM products p JOIN suppliers s ON s.supplier_id = p.supplier_id GROUP BY s.supplier_id, s.name ORDER BY product_count DESC, s.name LIMIT 5",
+  "query_type": "SELECT_AGGREGATE"
+ },
+ {
+  "question": "How much money was collected by each payment method?",
+  "sql": "SELECT method, SUM(amount) AS collected FROM payments WHERE status = 'captured' GROUP BY method ORDER BY collected DESC",
+  "query_type": "SELECT_AGGREGATE"
+ },
+ {
+  "question": "What is the average review rating for each product category?",
+  "sql": "SELECT c.name AS category, ROUND(AVG(r.rating), 2) AS avg_rating FROM reviews r JOIN products p ON p.product_id = r.product_id JOIN categories c ON c.category_id = p.category_id GROUP BY c.category_id, c.name ORDER BY avg_rating DESC",
+  "query_type": "SELECT_AGGREGATE"
+ },
+ {
+  "question": "Which 5 products generated the most revenue?",
+  "sql": "SELECT p.name, SUM(oi.line_total) AS revenue FROM order_items oi JOIN orders o ON o.order_id = oi.order_id JOIN products p ON p.product_id = oi.product_id WHERE o.status != 'cancelled' GROUP BY p.product_id, p.name ORDER BY revenue DESC LIMIT 5",
+  "query_type": "SELECT_AGGREGATE"
+ },
+ {
+  "question": "Show the 20 most recent orders with customer names",
+  "sql": "SELECT o.order_id, o.order_date, c.first_name, c.last_name, o.total_amount FROM orders o JOIN customers c ON c.customer_id = o.customer_id ORDER BY o.order_date DESC, o.order_id DESC LIMIT 20",
+  "query_type": "SELECT_JOIN"
+ },
+ {
+  "question": "Which products belong to the Electronics category?",
+  "sql": "SELECT p.product_id, p.name, p.unit_price FROM products p JOIN categories c ON c.category_id = p.category_id WHERE c.name = 'Electronics' ORDER BY p.product_id",
+  "query_type": "SELECT_JOIN"
+ },
+ {
+  "question": "List the products supplied by Japanese suppliers",
+  "sql": "SELECT p.product_id, p.name, s.name AS supplier FROM products p JOIN suppliers s ON s.supplier_id = p.supplier_id WHERE s.country = 'Japan' ORDER BY p.product_id",
+  "query_type": "SELECT_JOIN"
+ },
+ {
+  "question": "Show the 15 latest reviews with product name and rating",
+  "sql": "SELECT r.review_id, p.name AS product, r.rating, r.review_date FROM reviews r JOIN products p ON p.product_id = r.product_id ORDER BY r.review_date DESC, r.review_id DESC LIMIT 15",
+  "query_type": "SELECT_JOIN"
+ },
+ {
+  "question": "Which carrier shipped order 1000 and who is the customer?",
+  "sql": "SELECT s.carrier, c.first_name, c.last_name FROM shipments s JOIN orders o ON o.order_id = s.order_id JOIN customers c ON c.customer_id = o.customer_id WHERE s.order_id = 1000",
+  "query_type": "SELECT_JOIN"
+ },
+ {
+  "question": "List the line items of order 42 with product names",
+  "sql": "SELECT oi.order_item_id, p.name, oi.quantity, oi.line_total FROM order_items oi JOIN products p ON p.product_id = oi.product_id WHERE oi.order_id = 42 ORDER BY oi.order_item_id",
+  "query_type": "SELECT_JOIN"
+ },
+ {
+  "question": "Which customers have left a 1-star review?",
+  "sql": "SELECT DISTINCT c.customer_id, c.first_name, c.last_name FROM reviews r JOIN customers c ON c.customer_id = r.customer_id WHERE r.rating = 1 ORDER BY c.customer_id",
+  "query_type": "SELECT_JOIN"
+ },
+ {
+  "question": "What payment method was used on the 10 biggest orders?",
+  "sql": "SELECT o.order_id, o.total_amount, p.method FROM orders o JOIN payments p ON p.order_id = o.order_id ORDER BY o.total_amount DESC, o.order_id LIMIT 10",
+  "query_type": "SELECT_JOIN"
+ },
+ {
+  "question": "Show total revenue by month in 2025",
+  "sql": "SELECT strftime('%Y-%m', order_date) AS month, SUM(total_amount) AS revenue FROM orders WHERE status != 'cancelled' AND order_date >= '2025-01-01' AND order_date < '2026-01-01' GROUP BY month ORDER BY month",
+  "query_type": "SELECT_TEMPORAL"
+ },
+ {
+  "question": "Who were the top 5 customers by revenue last quarter?",
+  "sql": "SELECT c.customer_id, c.first_name, c.last_name, SUM(o.total_amount) AS revenue FROM orders o JOIN customers c ON c.customer_id = o.customer_id WHERE o.status != 'cancelled' AND o.order_date >= '2025-07-01' AND o.order_date < '2025-10-01' GROUP BY c.customer_id, c.first_name, c.last_name ORDER BY revenue DESC, c.customer_id LIMIT 5",
+  "query_type": "SELECT_TEMPORAL"
+ },
+ {
+  "question": "How many new customers signed up in 2024?",
+  "sql": "SELECT COUNT(*) AS new_customers FROM customers WHERE signup_date >= '2024-01-01' AND signup_date < '2025-01-01'",
+  "query_type": "SELECT_TEMPORAL"
+ },
+ {
+  "question": "What is the average delivery time in days for each carrier?",
+  "sql": "SELECT carrier, ROUND(AVG(julianday(delivered_date) - julianday(shipped_date)), 2) AS avg_delivery_days FROM shipments WHERE delivered_date IS NOT NULL GROUP BY carrier ORDER BY carrier",
+  "query_type": "SELECT_TEMPORAL"
+ },
+ {
+  "question": "How many orders were placed in the last 30 days?",
+  "sql": "SELECT COUNT(*) AS order_count FROM orders WHERE order_date >= date('2025-12-31', '-30 days')",
+  "query_type": "SELECT_TEMPORAL"
+ },
+ {
+  "question": "What was our revenue for each year?",
+  "sql": "SELECT strftime('%Y', order_date) AS year, SUM(total_amount) AS revenue FROM orders WHERE status != 'cancelled' GROUP BY year ORDER BY year",
+  "query_type": "SELECT_TEMPORAL"
+ },
+ {
+  "question": "Which month of 2024 had the most orders?",
+  "sql": "SELECT strftime('%Y-%m', order_date) AS month, COUNT(*) AS order_count FROM orders WHERE order_date >= '2024-01-01' AND order_date < '2025-01-01' GROUP BY month ORDER BY order_count DESC LIMIT 1",
+  "query_type": "SELECT_TEMPORAL"
+ },
+ {
+  "question": "How many customers have not placed an order since the start of 2025?",
+  "sql": "SELECT COUNT(*) AS inactive_customers FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id AND o.order_date >= '2025-01-01')",
+  "query_type": "SELECT_TEMPORAL"
+ },
+ {
+  "question": "How many reviews were written each month of 2025?",
+  "sql": "SELECT strftime('%Y-%m', review_date) AS month, COUNT(*) AS review_count FROM reviews WHERE review_date >= '2025-01-01' AND review_date < '2026-01-01' GROUP BY month ORDER BY month",
+  "query_type": "SELECT_TEMPORAL"
+ },
+ {
+  "question": "What was the revenue in each quarter of 2024?",
+  "sql": "SELECT (CAST(strftime('%m', order_date) AS INTEGER) + 2) / 3 AS quarter, SUM(total_amount) AS revenue FROM orders WHERE status != 'cancelled' AND order_date >= '2024-01-01' AND order_date < '2025-01-01' GROUP BY quarter ORDER BY quarter",
+  "query_type": "SELECT_TEMPORAL"
+ }
+]
